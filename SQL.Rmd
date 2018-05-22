@@ -1,0 +1,199 @@
+---
+title: "SQL Intro"
+output: html_notebook
+---
+
+# Databases and SQL
+
+In the early 1970's, computer scientists were developing ideas about how to store, modify and access large amounts of data that were shared by many people. Ted Codd developed a *relational database model*, which stores data in named tables, with the tables organized into rows and columns. Relations between rows in different tables could be used to connect the tables together.
+
+One of the challenges with managing large amounts of data in these tables is how to extract information from a database using a simple description. Codd's relational model allowed queries of a database to be expressed as concise, but highly mathematical, statements. Ray Boyce and Donald Chamberlain, wanting databases to be accessible to people who didn't have training in formal logic and set theory. They developed a language called Structured English Query Language (SEQUEL). The name was later changed to Structured Query Language (SQL).
+
+Several computer companies began creating databases using the relational model for data representation and SQL for database manipulation. In order to standardize the SQL language, the American National Standards Institute (ANSI) facilitated the development of a standard for SQL. As the theory and implementation of SQL has evolved, ANSI has issued standards of the language every few years. Although other models for databases have been developed since, the relational model (with SQL) remains the most popular way to manage large amounts of data.
+
+There are several popular implementations of relational database management systems (RDBMS) used today. We will use SQLite for the following reasons:
+
+1. Easy installation. Because SQLite is a freely available library that doesn't require a lot of overhead to run, it can be implemented as a library, for example as an R package or Python module. This will also simplify accessing the database.
+2. Easy maintenance. SQLite databases store their data, table definitions, and such in a single file, which can be saved, transferred and backed up in the same way as any other file.
+
+SQLite does have drawbacks, which may arise during our use of the databases, but it remains a good option for learning the concepts of databases.
+
+```{r setup, include=FALSE}
+library(RSQLite)
+newdb <- dbConnect(SQLite(), dbname="newdb.db")
+commute <- dbConnect(SQLite(), dbname="commute.db")
+```
+
+# Defining Tables in SQL: CREATE TABLE
+
+SQL was designed from the beginning to be used for data specification and data manipulation. The specification of data in a relational database typically refers to defining the tables of the database, as well as the columns within each table. The definitions are created to ensure the integrity of the data in the database. The statements below show two SQL statements for creating two tables in a database (used for recording commutes to and from work).
+
+```{sql connection=newdb}
+CREATE TABLE trip (
+tripnumber INTEGER PRIMARY KEY,
+starttime TEXT CHECK (time(starttime) IS NOT NULL),
+duration REAL NOT NULL CHECK (duration > 0),
+destination TEXT NOT NULL);
+
+CREATE TABLE route (
+tripnumber INTEGER NOT NULL REFERENCES trip,
+street TEXT NOT NULL,
+ordinal INTEGER CHECK(ordinal > 0));
+```
+
+After the words CREATE TABLE, a unique name for the table is given. The name of the table is followed by a set of parentheses, which contains a comma-separated list of column names. The names of the columns are accompanied by other words to specify the data that should be entered into the column.
+
+## Data Type
+
+Most databases require that the type of data to be entered into each column of the database be specified. The data types common to programming languages (integers, reals, strings, logical) are typically available in all RDBMSs, and many have additional data types for dates, times, currency, and more complex data. Specifying the type of data will help enforce *data integrity*, so that the format of the data is always consistent.
+
+## NOT NULL
+
+Most RDBMSs will allow the input of *NULL* values into columns of a database. NULL indicates that a value is not known or not applicable to a given row of the database. Whether it is beneficial to allow unknown values in a database is a matter of debate: it certainly reflects real-life situations, but it makes extraction and analysis of data more difficult. The addition of *NOT NULL* to a column definition ensures that the value in that column can't be unspecified, which can also help with data integrity.
+
+## UNIQUE/PRIMARY KEY
+
+Databases can also specify that a value in a column must be different from all other values in that column. This can help distinguish one row from another in a database table that might have otherwise similar rows. The combination of a *UNIQUE* constraint and a *NOT NULL* constraint form the basis of a *PRIMARY KEY*. Using primary keys can make it easier to make changes in a database at exactly the intended rows.
+
+### Foreign Keys
+
+Having a column with unique, known values allows values in different tables to be connected using *foreign key* constraints. A table can ensure that values in one column *REFERENCE* values in another table by specifying the table. Typically, the table following the REFERENCE word must have a primary key, and it is the column with the primary key which must have the value referenced. This is so the database can take appropriate action if the row with the referenced value gets deleted, which means that the *referential integrity* of the data would be otherwise compromised.
+
+## CHECK
+
+Databases can check not only that data is of the correct type, and is not an unknown value, but can make sure that value fits in an appropriate range. This is accomplished in a database using a *CHECK* restraint. The expression following the word CHECK must evaluate to TRUE before the row can be added to the database.
+
+## Default Values
+
+Column specifications can also indicate what information should be put in a given column if no value is provided. This is accomplished using the *DEFAULT* keyword in a column definition. This may be a constant value (like 1.5 for a real number column) or a function that provides a value of the appropriate type (like a function that returns the current date).
+
+A few column definitions imply a default value in their specification. For instance, if a column is an INTEGER PRIMARY KEY, most databases will supply an integer that is not currently being used in another row of that table. In SQLite, this integer is one greater than the largest integer in the table. For columns that do not have a NOT NULL constraint, the default value is NULL (unknown).
+
+# Modifying Contents: INSERT, DELETE, UPDATE
+
+```{sql connection=newdb}
+-- Add a row to the database, using the default ordering of the columns.
+INSERT INTO trip VALUES (341, '2015-02-20 07:02:00', 34.1, 'UBC');
+
+-- Specify the columns explicitly.
+INSERT INTO trip (tripnumber, starttime, duration, destination) VALUES
+(342, '2015-02-20 17:15:00', 38.7, 'Home');
+
+-- Because the tripnumber column is an integer primary key, the database
+-- will supply a default value if it is not included.
+INSERT INTO trip (starttime, duration, destination) VALUES
+('2015-02-23 07:04:00', 36.5, 'UBC');
+
+-- We wouldn't have to use the same order, if we specify the columns.
+INSERT INTO trip (destination, starttime, duration) VALUES
+('Home', '2015-02-23 17:08', 39.3);
+
+-- We can add more than one row at a time.
+INSERT INTO route (tripnumber, street, ordinal) VALUES
+(342, 'Midwest', 1),
+(342, 'Reno', 2),
+(342, 'Mockingbird', 3);
+```
+
+Data is added to a database using statements with the *INSERT* keyword. In the simplest case, INSERT INTO is followed by the table name and a list of values to put into a row of the table. Alternately, the table name can be followed by a list of column names, the word *VALUES* and a list of the values that go into each column. This second approach is more flexible, in part because the user doesn't need to know what order the columns are in in the table, just the names of the columns. It's also more flexible in that not every column needs to have a value provided, just the ones that are named. The default value for the column can be used if the statement doesn't provide one.
+
+There are other ways to insert rows into a table. Probably the most common is to use the output from a SELECT query (below) as the values to insert into another table. These additional methods are beyond the scope of our introduction, though.
+
+```{sql connection=newdb}
+-- To make changes to rows, use an UPDATE command.
+UPDATE trip SET duration = 38.4 WHERE tripnumber = 342;
+
+-- This would change _all_ the rows! Use with caution!
+-- UPDATE trip SET duration = 35.0;
+
+-- You can calculate new values based on old values;
+UPDATE trip SET duration = duration - 1.2 WHERE destination = 'Home';
+```
+
+Information in databases can be modified using *UPDATE* statements. These allow values in columns to be changed using the *SET* keyword for rows that match the *WHERE* clause in the statement. The new value can be provided by the statement or calculated from the values in the premodified row. It's possible to change the values in all of the rows in the database by omitting the WHERE clause.
+
+In order to modify just one row of a table, it's usually preferable to specify a unique value in the WHERE clause. This is another value to including UNIQUE constraints in one of the columns of the database.
+
+```{sql connection=newdb}
+-- To remove rows, use the DELETE command.
+DELETE FROM route WHERE tripnumber = 342;
+DELETE FROM trip WHERE tripnumber = 342;
+
+-- This would get rid of all rows in a table. Probably never use!
+-- DELETE FROM trip;
+```
+
+Rows of a table can be removed from a database using the *DELETE* keyword. The words DELETE FROM are followed by a table name and a WHERE clause that must evaluate to true in order for the rows to be dropped. Of course, the WHERE clause doesn't have to be included; this will result in the removal of all of the rows in the table. This is usually not desirable, though.
+
+# Extracting Data: The SELECT Statement
+
+```{sql connection=commute}
+SELECT starttime, destination, duration FROM trip;
+```
+
+Data can be extracted from a database using a *SELECT* statement. A simple form of the statement lists the columns, followed by *FROM*, followed by the name of the table. An asterisk can be used in place of the column list; this will retrieve all the columns in the table.
+
+## WHERE Clauses
+
+```{sql connection=commute}
+SELECT starttime, duration FROM trip WHERE duration > 40;
+```
+
+One of the advantages of using a relational database is the ability to filter large amounts of data. A common tool for filtering data in a query is a *WHERE* clause. This clause must evaluate as true in order for the row to be included in the output.
+
+It's worth noting that the values tested in the WHERE clause do not have to be included in the listed columns. RDBMSs usually determine which rows should be included in queries before they determine the output columns.
+
+## ORDER BY Clauses
+
+```{sql connection=commute}
+SELECT duration FROM trip WHERE destination = 'Home' ORDER BY duration;
+```
+
+Databases can sort rows as well as filtering them. Output is sorted using an *ORDER BY* clause, to indicate which columns should be used for sorting. By default, ORDER BY clauses will sort rows in ascending sequence (numerically for numbers, alphabetically for text). By appending *DESCENDING* (or DESC) to the clause, the sorting will be in reverse order.
+
+## DISTINCT
+
+```{sql connection=commute}
+SELECT DISTINCT street FROM route ORDER BY street;
+```
+
+Queries can also be filtered using the *DISTINCT* keyword. Duplicate rows of the output are removed when retrieving the data.
+
+## Functions in Queries
+
+```{sql connection=commute}
+SELECT date(starttime) as startdate, duration FROM trip;
+```
+
+The output of a SELECT query doesn't just have to be the values in the database. Most RDBMSs facilitate performing calculations on the data in the columns. These calculations may be arithmetic operations on numerical values, or possibly functions using column values as arguments.
+
+### Aggregate Functions
+
+```{sql connection=commute}
+SELECT destination, avg(duration) FROM trip GROUP BY destination;
+```
+
+One of the most valuable type of functions that can be applied to columns of a table are *aggregate functions*. These functions take a collection of values and return a single value, which can facilitate further processing of large amounts of information. Common aggregate functions include functions for averaging or summing data, or finding maximum or minimum values in the collection.
+
+When a *GROUP BY* clause is included in the query, aggregate functions are applied to sets of data that have the same value in the GROUP BY clause. Without this clause, the aggregation is done over all the rows in the query.
+
+## Table Joins
+
+```{sql connection=commute}
+SELECT street, avg(duration) as duration FROM trip NATURAL JOIN route 
+GROUP BY street ORDER BY duration;
+```
+
+One of the most significant aspects of relational databases is to be able to relate the records in one table with the records in another table. This is done using a *JOIN* of two tables in a SELECT statement. In the simplest form of a table join, each row of one table is combined with each row of another table, such that the join contains every combination of rows from the two tables. For instance, if one table contained 7 rows, and other table contained 11 rows, the join would contain 77 rows. A join with all these rows is usually not desirable, so WHERE clauses are often used to specify how the columns of one table should be related to the columns of another table.
+
+There are modified versions of joins that can facilitate the filtering process. For instance, a *NATURAL JOIN* compares values in columns that have the same name in the joined tables, and returns the rows in which those values are the same. In the example above, because both the "trip" and "route" tables have a column called "tripnumber", the NATURAL JOIN will return the combinations of rows for which "tripnumber" has the same value. This is called a "natural" join because we would naturally associate identical values with identical names in different tables.
+
+# Beyond Simple Statements
+
+```{sql connection=commute}
+SELECT street, avg(duration) as longtime FROM trip NATURAL JOIN route
+WHERE tripnumber NOT IN (select tripnumber FROM route WHERE
+street = 'NE 10th') GROUP BY street ORDER BY longtime;
+```
+
+It's possible to extract meaningful subsets and collations of large amounts of data in a relational database using fairly simple SQL queries. Manipulation of data in SQL is not limited to simple statements, though. The ability to temporarily rename columns or tables, combined with the concept of *subqueries*, allows more complex statements to be constructed for more sophisticated data extraction. While these more complex statements are beyond the scope of this course, it's helpful to know that relational databases and SQL are capable of much more than the simple uses we've described here.

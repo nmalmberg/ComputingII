@@ -1,0 +1,174 @@
+---
+title: "Basics of R"
+output: html_notebook
+---
+
+# R Data Structures
+
+R has many of the same data types that are present in other languages, such as strings (called character strings in R), numeric values and logical values. Often, values of the same type are combined together in a structure called a *vector*. The most basic way to create a vector is by giving the values as arguments to the *c* function, which creates the vector from those values.
+
+```{r}
+mynumbers <- c(1, 19.7, 4.2, 85, 12.4)
+mynumbers
+```
+
+Operations on vectors are usually performed element-wise, as should be evident in the following examples.
+
+```{r}
+mynumbers * 3
+mynumbers + 2.5
+mynumbers + c(5, 3, 4, -20, 7)
+mynumbers * 1:5
+1:5
+```
+
+Comparison operators can be used to create a vector of logical values.
+
+```{r}
+mynumbers > 20
+```
+
+Subsets of vectors can be accessed by providing another vector within square brackets after the name of the vector.
+
+```{r}
+mynumbers[2]
+mynumbers[2:4]
+mynumbers[c(3,1,5)]
+mynumbers[mynumbers > 15]
+```
+
+Data in R can also be organized into lists, which contain an ordered group of elements (including vectors and other lists) that are not necessarily of the same type. These elements may be optionally named, in which case the elements may be accessed by name or by number. A special type of list, in which all the elements have the same length, is called a *data frame*, and is a particularly useful arrangement of data.
+
+Data frames can be created using the data.frame function, but it's more common to generate data in another program and read it into R using the *read.table* function. This function takes as it's main argument the name of a text file containing lines of data separated by spaces (whitespace to be particular), and creates a data frame with each column of data as an element in the data frame. There are also several optional arguments, including whether the first line of the file contains column names, what character(s) separate data in a line, and how many lines to read from the file. There's also an argument to supply text, if you didn't want to create a separate text file with the data. A few of these options are shown in the examples below.
+
+```{r}
+mileagedata <- read.table("gasoline.data",header = TRUE)
+duckframe <- read.table(header=TRUE, text="
+blind         species        paddling
+HollowGrove   Mallard        21
+MarshaMarsha  Eider          19
+HollowGrove   Eider          12
+MarshaMarsha  Mallard        14
+HollowGrove   Mallard        18
+MarshaMarsha  Eider          20
+HollowGrove   Eider          13
+MarshaMarsha  Mallard        11
+HollowGrove   Mallard        20
+MarshaMarsha  Eider          22
+HollowGrove   Eider          13
+MarshaMarsha  Mallard        12")
+```
+
+When the read.table function reads a vector of strings, it converts the vector to a structure called a *factor*. Factors are much like vectors, but they also keep track of the unique values, called *levels*, in the factor. This type of data structure is particularly useful when the column represents different categories into which each row may be grouped.
+
+```{r}
+duckframe$species
+```
+
+# Creating Plots in R
+
+```{r}
+plot(ppg~station, data=mileagedata)
+```
+
+```{r}
+plot(mpg~fuel, data=mileagedata)
+```
+
+```{r}
+plot(mpg~ppg, data=mileagedata)
+```
+
+# Statistical Analysis in R
+
+In addition to standard arithmetic functions and operators, R ships with several functions to perform statistical analyses of data. Other statistical tools are available for installation (see Additional Packages below). These functions are often flexible in their inputs, so there can be more than one way to organize your data to use the function, and more than one way to call the function with your data. Generally, though, R functions are geared toward a data frame arrangement of data.
+
+## Student's T-test
+
+One of the most common tools to identify statistical significance is Student's T-test. This test uses averages, standard deviations and numbers of samples to determine whether a set of values are different from a "true" value (one-sample), or whether two sets of values are different from each other (two-sample). The T-test can also be used to compare individual samples in two different conditions, in which case the data points are paired. R performs all of these tests using the t.test function.
+
+The t.test function can be supplied with two numeric vectors to perform a two-sample test. Two-sample t-tests can be performed by providing two numeric vectors to the function, or by using a *formula* interface. To use a formula in the t.test function, data must be in a data frame, and one of the columns of the data frame must be a factor with two levels that correspond to the two groups you want to compare. An example of each method is supplied below. The first gives two numeric vectors, the second supplies a formula to the function.
+```{r}
+mileagedata$fuel=="Unleaded87"
+```
+
+```{r}
+t.test(mileagedata$mpg[mileagedata$fuel=="Unleaded87"],
+       mileagedata$mpg[mileagedata$fuel=="E10"])
+t.test(paddling~blind, data=duckframe)
+```
+
+There are several optional arguments to the t.test function. One-sample T-tests use the mu argument to indicate the expected value for the mean, and paired T-tests use paired=TRUE to change the means by which the values are compared (paired T-tests also need to have the same length, so using two columns in a data frame works well for these). Other optional parameters include setting the confidence interval and the alternative hypothesis, although the defaults are usually appropriate.
+
+The t.test function doesn't return a value, but it prints the results of the test to the console (or Markdown document in the case of RStudio). There's generally not a lot more to do with the information in a T-test than to read the results, anyway.
+
+## Analysis of Variance
+
+For data with more than one category, or for data with multiple determining variables, a T-test is often insufficient. Analysis of variance is a technique similar to a T-test, but accounting for variation among several different categories, and potentially looking at interactions between determining variables. In R, the *aov* function is usually used to perform an analysis of variance. 
+
+Analysis of variance often requires additional data extraction, so unlike the T-test, the results of the aov function create an object that can be used as the argument for other functions. This is definitely a different approach than other statistical programs, but is very convenient once you understand it.
+
+```{r}
+gasstations <- aov(ppg~station, data=mileagedata)
+summary(gasstations)
+duckblind <- aov(paddling~blind, data=duckframe)
+summary(duckblind)
+duckblindspecies <- aov(paddling~blind*species,
+                        data=duckframe)
+summary(duckblindspecies)
+```
+
+When a significant difference is found in the analysis of variance, the TukeyHSD function can be used to identify which pairs of categories have the significant differences. The function returns an object that can be printed or plotted.
+
+```{r}
+duckTukey <- TukeyHSD(duckblindspecies)
+duckTukey
+plot(duckTukey)
+```
+
+## Linear Models
+
+When a determining variable and a response variable are both numeric, it is often appropriate to establish whether a mathematical relationship exists between the two variables. The simplest relationship between two numeric variables is a linear relationship, and R can determine whether a linear relationship exists using a *linear model*. This is calculated using the *lm* function. This function calculates slopes and intercepts, but also provides a measure of uncertainty in the values. Also like the aov function, the output can be used as an argument for other functions, so the output of the lm function is usually stored in a variable.
+
+```{r}
+mpgmodel <- lm(mpg~ppg, data=mileagedata)
+summary(mpgmodel)
+plot(mpg~ppg, data=mileagedata)
+abline(mpgmodel)
+```
+
+In addition to the lm function, the glm function can determine a linear model for variables that aren't directly linearly related, but which can be transformed to a linear relationship using a common function. The nls function can calculate a nonlinear model for the data, provided the form of the model and appropriate starting guesses for the parameters in the model.
+
+# Additional Packages
+
+R has several built-in functions to read, analyze and display data, but there are many other functions created for R to perform different analyses, read different types of data, or display data in a new manner. Many of these are available in the Comprehensive R Archive Network (CRAN), which also distributes the R program itself.
+
+Packages that are available on CRAN can be found on the [CRAN webpage](http://cran.r-project.org). The package list can be browsed by name or by area of interest (Task Views). The website (with the packages) can also be searched to find packages of interest. When you find a package to install, the *install.packages* command is used from the console to install the package by name. Alternatively, RStudio has menu options for installing packages from the repositories. The code block below installs the Rpdb package, which can be used to read and perform calculations on Protein Data Bank files.
+
+```{r}
+install.packages("Rpdb")
+```
+
+When a package has been successfully installed, the functions in the package can be made available using the *library* function. This process of installing and making packages available is how RStudio can communicate with SQL databases, by using a package written to communicate with a database (RSQLite in our case). 
+
+```{r}
+library(RSQLite)
+connection <- dbConnect(dbDriver("SQLite"),
+                        dbname="commute.db")
+alltrips <- dbGetQuery(connection,
+                       paste("SELECT destination, street, duration",
+                             "FROM trip NATURAL JOIN route"))
+# Analysis of variance just based on street.
+street <- aov(duration ~ street, data = alltrips)
+summary(street)
+```
+
+The following code block makes the functions in Rpdb available, and uses them to read a PDB file into a data frame and display the structure of the protein.
+
+```{r}
+library("Rpdb")
+lysozyme <- read.pdb("1HEW.pdb")
+(lysozyme$atoms)
+```
+
+Other entities also create packages for use in R, but do not make these packages available through CRAN. Probably the most popular of these is the Bioconductor project that is used to analyze genomic data. Of course, anyone is allowed to write new packages for R; there are several tools available in R to facilitate this process.

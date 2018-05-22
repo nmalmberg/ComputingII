@@ -1,0 +1,86 @@
+---
+title: "Reproducible Research and Computing"
+author: "Nathan Malmberg"
+date: "Spring 2018"
+output: 
+  slidy_presentation:
+    duration: 20
+bibliography: reproducibility20170510.bib
+csl: nature.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# The Need for Reproducible Research
+## Reproducible vs. Replicable
+- Reproducible
+    - Different researchers
+    - Same data
+    - Same results
+- Replicable
+    - Different researchers
+    - Different data
+    - Same results
+
+## Much Current Research Isn't Reproducible
+- Reproducibility Problems in
+    - Pharmacology[@prinz_believe_2011]
+    - Cancer Research[@soukup_prognostic_2017;@mobley_survey_2013]
+    - Neurophysiology[@gilmore_progress_2017;@heroux_questionable_2017;@zeiss_reproducibility_2017]
+    - Other areas
+- Scientists still believe the research.[@baker_1500_2016]
+
+## Value of Reproducible Research
+- How did that other lab analyze their data?
+- How did our lab analyze our data?
+- How did I analyze my data?
+
+# Reproducible Research and Computing
+
+## Challenges of Reproducible Research
+- Make (raw) data available
+- Use standard methods
+- Describe data analysis exactly
+    - Program vs. Interpreter vs. GUI
+    
+## Literate Programming
+- Combine documentation and program in one file
+- Donald Knuth: WEB[@knuth_literate_1992]
+    - WEAVE: Make printable documentation.
+    - TANGLE: Make Pascal program.
+- Noweb: Generalize for other languages, document systems
+
+## RMarkdown
+- Markdown: Simplified markup language
+- RMarkdown: Add markers for blocks of code
+    - Oriented toward R, but other languages can be used
+- Data analysis and final document created at the same time
+    - Analysis will always match final document
+- Changing data only requires reprocessing file
+
+## Include Data Analysis
+```{r}
+mileageframe <- read.table("gasoline.data")
+ppgaov <- aov(ppg ~ fuel / station, data=mileageframe)
+summary(ppgaov)
+```
+
+## Include Graphs
+```{r}
+plot(ppg ~ fuel, data=mileageframe, xlab="Fuel Type", ylab="Price Per Gallon")
+```
+
+## Literate Programming Isn't for Everyone
+> Without wanting to be elitist, the thing that will prevent literate programming from becoming a mainstream method is that it requires thought and discipline. The mainstream is established by people who want fast results while using roughly the same methods that everyone else seems to be using, and literate programming is never going to have that kind of appeal. This doesn't take away from its usefulness as an approach.
+    --Patrick TJ McPhee
+
+## ...but is it the Right Thing to Do?
+5 For this very reason, make every effort to supplement your faith
+  with virtue, and virtue with knowledge, 6 and knowledge with
+  self-control, and self-control with steadfastness, and steadfastness
+  with godliness, 7 and godliness with brotherly affection, and
+  brotherly affection with love. (2 Peter 1:5-7)
+  
+## References

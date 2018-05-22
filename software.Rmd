@@ -1,0 +1,118 @@
+---
+title: "Software for GNSC 3301"
+output: html_notebook
+author: Nathan Malmberg
+---
+
+# RStudio
+
+As we explore different programming languages, it will be helpful to use an Integrated Development Environment (IDE) that will facilitate writing and running programs. Generally, an IDE is specifically focused on one language, but there are IDEs that can facilitate programming in muliple languages. We will use RStudio for the following reasons:
+
+* Support for R, SQL and Python languages (among others)
+* Support for literate programming using [RMarkdown](http://rmarkdown.rstudio.com), a simplified markup language that can incorporate programs with text.
+* Simple creation of documents or presentations using RMarkdown.
+* Simple testing of code within the document formats supported by RStudio.
+
+RStudio doesn't do everything perfectly, but its strengths are well-suited to a classroom environment.
+
+## Installing R
+
+While RStudio facilitates creation of programs in muliple languages, it is undoubtedly biased in favor of R. RStudio requires that R be installed before RStudio is installed. Several tasks that would seem to be specific to the development environment are accomplished using R.
+
+While there are several different approaches to installing R on a computer (I personally use MacPorts for my work computer), the most straightforward approach for Windows and Mac users will be to download a binary installer from [CRAN: The Comprehensive R Archive Network](http://cran.r-project.org). Select and install the latest version of R that works with your operating system.
+
+If you plan to use a Raspberry Pi for your computer, you can install R by typing
+
+```{bash, eval=FALSE}
+sudo aptitude update
+sudo aptitude install r-recommended
+```
+
+at a command prompt.
+
+## Installing RStudio
+
+Once you've installed R, you should have the prerequisites for installing [RStudio](http://www.rstudio.com/products/rstudio/download). Follow the link for downloading RStudio Desktop Open Source version, and download the appropriate installer for your operating system. For Windows users, you will want to run the executable you've downloaded. For MacOS users, you'll mount the downloaded disk image and drag the icon to the Applications folder.
+
+Unfortunately, the packages of RStudio that are available for Linux machines are not compatible with the Raspberry Pi. There are other programs that can be used to create these documents; ask your instructor about the options.
+
+The first time you run the RStudio program, you are likely to encounter an error, as the additional R packages required for RStudio haven't been downloaded and installed by the program. The program should work normally the next time you run it.
+
+When RStudio is installed correctly, you should be able to open this webpage in RStudio, and use the button at the top of the page to extract the notebook that was used to create the webpage. This will allow you to run code in the notebook both to test your installation and to install other components helpful for the course. The code blocks in the notebook will be enclosed in triple backticks, and should be highlighted, and contain widgets for running the code as well as adjusting the settings for the code block. One of these code blocks is shown below. To test your system, click the green arrow pointing to the right in the box below.
+
+```{r}
+plot(cars)
+```
+
+If a scatterplot appears above these words, it would indicate a successful installation of R and RStudio.
+
+# Python
+
+While RStudio is specifically geared toward programming in R, we will start with Python, a more general purpose language. Python is used in a wide variety of settings to learn how to program (Python programs can be very simple) as well as perform advanced scientific computing tasks (NASA is listed among the organizations that relies heavily on Python). A version of Python is installed by default on multiple operating systems (Windows being the notable exception). We will plan to use a more recent version of Python, in part because the language has been improved, and in part because it may be easier to install the additional components we will use in this course.
+
+## Installing the Python Interpreter
+
+Windows and MacOS users can find downloads for Python 3 at the [main Python webpage](http://www.python.org). Download and install the Python 3 appropriate to your operating system. If you're using the latest version of Raspbian for your Raspberry Pi, Python 3 should already be installed on your system.
+
+Because Python, like most programming languages, is command driven rather than menu driven, you probably won't have an icon to click to run Python. You should be able to start the interpreter at a command prompt to try typing Python commands for the program to execute. You can also run the code below, but be sure to adjust the engine path to the place you've installed Python.
+```{python, engine.path="/opt/local/bin/python3.5"}
+# A blast from the Sesame Street past!
+for ladybug in range(12):
+    print(ladybug + 1)
+print("ladybugs came to the ladybug picnic!")
+```
+
+## Tcl/Tk
+
+We will learn some of the foundational aspects of programming using the Turtle environment, which is a fun way of seeing the results of our programs in action. The Turtle language is built into Python, but the environment needed to show the turtle will need to be installed on Windows computers, and possibly on MacOS computers.
+
+To test if you need to install Tcl/Tk on your computer, try running the code below, adjusting the engine path as needed.
+```{python, engine.path="/opt/local/bin/python3.5"}
+import time
+from turtle import *
+home()
+time.sleep(10)
+```
+
+If a window with an arrow appears, you should have everything you need to run the Turtle programs we will use. If you get an error message, but you know your Python installation works, it probably means you need to install Tcl/Tk. There are multiple versions of this environment available, but the most developed version is from [Active State](https://www.activestate.com/activetcl/downloads). Download and install the Community Edition in the most recent form available for your operating system.
+
+## Biopython
+
+There are several modules available for Python that are specifically designed for scientific purposes. We will take a brief look at [Biopython](http://biopython.org), a module to facilitate computational molecular biology.
+
+Biopython must be downloaded and installed in order to be used, but this can all be done by Python itself, if you have a full version of Python installed. Running the command below should download and install Biopython. You may need to change 'python3' to let your computer know where to find the Python program you installed earlier.
+```{bash}
+python3 -m pip install biopython
+```
+
+Raspberry Pi users will want to install Biopython using the package management tools using the code below.
+```{bash}
+sudo aptitude update
+sudo aptitude install python3-biopython
+```
+
+If your installation of Biopython is successful, you should be able to run the following code (adapted from the Biopython documentation) to download a sequence file from the NCBI nucleotide database. Be sure to change the email address before running the program.
+```{python}
+from Bio import Entrez
+Entrez.email = 'Science.Student@okbu.edu'
+sequence = Entrez.efetch(db='nucleotide',id='EU490707',
+                         rettype='gb', retmode='text')
+print(sequence.read())
+```
+
+# SQL
+
+One of the important reasons to learn about computers in science is to manage the vast quantities of data that are being generated and collected. Much of this data is stored in relational databases, and the storage, retrieval and processing of the data in these relational databases is done using Standard Query Language (SQL).
+
+There are several different database servers that use SQL. We will plan to use SQLite, which is not actually run as a server and will require minimal software installation. The only software that we will need is a module for R that is used to interact with SQLite databases called RSQLite. This can be installed using the following code:
+```{r}
+install.packages("RSQLite")
+```
+Raspbian has SQLite installed by default, and packages for the interaction between R and SQLite can be downloaded from the Raspbian repositories.
+
+When this software is installed, you should be able to run the following block without errors:
+```{r}
+library(DBI)
+connection <- dbConnect(RSQLite::SQLite(), db=":memory:")
+```
+
