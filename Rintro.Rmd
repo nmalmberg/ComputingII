@@ -167,8 +167,12 @@ The following code block makes the functions in Rpdb available, and uses them to
 
 ```{r}
 library("Rpdb")
-lysozyme <- read.pdb("1HEW.pdb")
-(lysozyme$atoms)
+lysozyme <- read.pdb("1bna.pdb")
+basepairs <- subset(lysozyme$atoms, !grepl("^O?P|'$", lysozyme$atoms$elename))
+basepairs$bp <- basepairs$resid
+basepairs$bp[basepairs$chainid=="B"] <- 25 - basepairs$bp[basepairs$chainid=="B"]
+stacking <- lm(x3~x1+x2+bp, data=basepairs)
+summary(stacking)
 ```
 
 Other entities also create packages for use in R, but do not make these packages available through CRAN. Probably the most popular of these is the Bioconductor project that is used to analyze genomic data. Of course, anyone is allowed to write new packages for R; there are several tools available in R to facilitate this process.
