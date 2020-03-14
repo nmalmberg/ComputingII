@@ -72,6 +72,28 @@ duckframe$species
 
 ## Base Graphics
 
+R comes with several functions to create plots of data. These functions are
+described in the *graphics* section of the package index in the help. In many
+cases, only one function is required to create a plot, the *plot* function.
+The plot function can create different types of plots based on the type of
+data it is supplied. The function can also deduce several reasonable default
+values for different components of the plot.
+
+The most conceptually familiar approach to creating a plot is to supply two
+sets of numbers, a set for the x values and a set for the y values. These
+can be supplied to the plot function as a pair of vectors.
+
+```{r}
+plot(mileagedata$ppg, mileagedata$mpg)
+```
+
+Because these vectors must have the same length, and because they are usually
+associated with each other, these vectors will often be a part of a data frame.
+In this case, it is often helpful to provide the vectors to the function in
+the form of a *formula*. You can often consider a formula to be a representation
+of a y variable (or response variable) as a function of x variables (or 
+determining variables). For this type of representation, the data frame which
+contains these variables must also be provided to the function.
 
 ```{r}
 plot(mpg~ppg, data=mileagedata)
