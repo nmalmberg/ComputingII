@@ -70,8 +70,11 @@ duckframe$species
 
 # Creating Plots in R
 
+## Base Graphics
+
+
 ```{r}
-plot(ppg~station, data=mileagedata)
+plot(mpg~ppg, data=mileagedata)
 ```
 
 ```{r}
@@ -79,8 +82,9 @@ plot(mpg~fuel, data=mileagedata)
 ```
 
 ```{r}
-plot(mpg~ppg, data=mileagedata)
+plot(ppg~station, data=mileagedata)
 ```
+
 
 # Statistical Analysis in R
 
