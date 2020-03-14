@@ -99,12 +99,32 @@ contains these variables must also be provided to the function.
 plot(mpg~ppg, data=mileagedata)
 ```
 
+When a numeric vector is plotted as a function of a factor, a different type
+of plot is created.
+
 ```{r}
 plot(mpg~fuel, data=mileagedata)
 ```
 
+The plot function has several parameters, most of which have default values
+that work reasonably well. Different arguments can be supplied to these
+parameters to change different aspects of the plot. A full list of the
+parameters can be found in the help for the plot function.
+
 ```{r}
-plot(ppg~station, data=mileagedata)
+plot(ppg~station, data=mileagedata, ylabel="Price ($/gallon)")
+```
+
+More complex plots can be created by combining the plot function with other
+functions that make modifications to an existing plot. The following plot will
+start with an empty plot, in order to create a plot with appropriate ranges
+for the x and y values of all the points.
+
+```{r}
+plot(mpg~ppg, data=mileagedata, type="n")
+points(mpg~ppg, data=mileagedata, subset=(fuel=="Unleaded87"), pch=21, bg="blue")
+points(mpg~ppg, data=mileagedata, subset=(fuel=="E10"), pch=22, bg="green")
+legend("topleft", legend=c("Unleaded87","E10"), pch=21:22, pt.bg=c("blue","green"))
 ```
 
 
