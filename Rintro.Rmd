@@ -1,6 +1,6 @@
 ---
 title: "Basics of R"
-output: html_notebook
+output: html_document
 ---
 
 # R Data Structures
@@ -15,6 +15,7 @@ mynumbers
 Operations on vectors are usually performed element-wise, as should be evident in the following examples.
 
 ```{r}
+mynumbers
 mynumbers * 3
 mynumbers + 2.5
 mynumbers + c(5, 3, 4, -20, 7)
@@ -25,12 +26,14 @@ mynumbers * 1:5
 Comparison operators can be used to create a vector of logical values.
 
 ```{r}
+mynumbers
 mynumbers > 20
 ```
 
 Subsets of vectors can be accessed by providing another vector within square brackets after the name of the vector.
 
 ```{r}
+mynumbers
 mynumbers[2]
 mynumbers[2:4]
 mynumbers[c(3,1,5)]
