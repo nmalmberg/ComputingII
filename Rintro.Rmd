@@ -128,6 +128,55 @@ legend("topleft", legend=c("Unleaded87","E10"), pch=21:22, pt.bg=c("blue","green
 ```
 
 
+## ggplot2
+
+The graphics functions in the *ggplot2* package represent a different approach
+to creating a plot than the base graphics functions. These functions can be
+accessed by loading the package with the *library* function.
+
+```{r}
+library(ggplot2)
+```
+
+The ggplot2 functions use a "grammar of graphics" approach to create the plot
+(hence the name). This process starts by creating an object from a set of data,
+and add additional components of a graph in an expression like a math expression.
+The plot can be stored in a variable, which can serve as the basis for
+adding more components to the plot. These functions allow the creation of a
+fairly complex plot with a few functions.
+
+```{r}
+ggplot(mileagedata, aes(ppg, mpg, color=fuel, shape=station)) + geom_point()
+```
+
+The grammar of graphics is somewhat flexible, as the graphics aesthetics (like
+color, shape and others) can be supplied either to the main graph or to individual
+components of the plot. Be advised, though, that just like with normal grammar,
+variations in placement of instructions can sometimes have different meanings.
+
+```{r}
+ggplot(mileagedata, aes(mpg, ppg)) + geom_point(aes(color=fuel, shape=station))
+```
+
+The grammar of graphics used by ggplot2 has a complexity that takes a while to
+master, so this can definitely serve primarily as an introduction to this
+package. There are several tutorials online that can also be used to increase
+your understanding of this approach.
+
+## ggpubr
+
+The ggplot2 package produces plots that have a fairly high degree of information
+with a relatively small number of functions. In this sense, ggplot2 plots are
+a good resource for visualization for data *exploration*. However, the plots
+are generally not formatted in a way that is appropriate for *publication*.
+Furthermore, the changes that would be required to make the plots
+publication-ready are not trivially easy to make in ggplot2. Other R packages
+have been developed to address this shortcoming in ggplot2. One of the more
+useful packages in this regard is ggpubr. As the name suggests, the package was
+designed to use the approach of ggplot2 to make publication quality plots.
+
+
+
 # Statistical Analysis in R
 
 In addition to standard arithmetic functions and operators, R ships with several functions to perform statistical analyses of data. Other statistical tools are available for installation (see Additional Packages below). These functions are often flexible in their inputs, so there can be more than one way to organize your data to use the function, and more than one way to call the function with your data. Generally, though, R functions are geared toward a data frame arrangement of data.
