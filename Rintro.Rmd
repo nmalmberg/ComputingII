@@ -175,7 +175,36 @@ have been developed to address this shortcoming in ggplot2. One of the more
 useful packages in this regard is ggpubr. As the name suggests, the package was
 designed to use the approach of ggplot2 to make publication quality plots.
 
+```{r}
+library(ggpubr)
+```
 
+The approach used by ggpubr is similar to ggplot, in that a plot is created
+by starting with a data frame and defining the x and y axes. However, while
+ggplot2 starts with a single function (ggplot) and adds points and other
+components to the plot, ggpubr starts with different functions depending on the
+type of plot to be created.
+
+```{r}
+fuelplot <- ggboxplot(mileagedata, x="fuel", y="ppg")
+fuelplot
+```
+
+Plots created with ggpubr start with a style that is more amenable to publication
+than ggplot2, but there are also several color palattes that are specifically
+designed for different scientific journals (and other more whimsical targets).
+
+```{r}
+set_palette(fuelplot, palette="aaas")
+```
+
+In addition, ggpubr allows simple statistical evaluations to be added to a
+plot.
+
+```{r}
+fuelplot + stat_compare_means(comparisons = list(c("E10", "Unleaded87")),
+                              method="t.test")
+```
 
 # Statistical Analysis in R
 
