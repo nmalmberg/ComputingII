@@ -1,7 +1,7 @@
 ---
 title: "Reproducible Research and Computing"
 author: "Nathan Malmberg"
-date: "Spring 2018"
+date: "Spring 2019"
 output: 
   slidy_presentation:
     duration: 20
@@ -15,13 +15,13 @@ knitr::opts_chunk$set(echo = FALSE)
 
 # The Need for Reproducible Research
 ## Reproducible vs. Replicable
-- Reproducible
-    - Different researchers
-    - Same data
-    - Same results
 - Replicable
     - Different researchers
     - Different data
+    - Same results
+- Reproducible
+    - Different researchers
+    - Same data
     - Same results
 
 ## Much Current Research Isn't Reproducible
@@ -77,10 +77,10 @@ plot(ppg ~ fuel, data=mileageframe, xlab="Fuel Type", ylab="Price Per Gallon")
     --Patrick TJ McPhee
 
 ## ...but is it the Right Thing to Do?
-5 For this very reason, make every effort to supplement your faith
-  with virtue, and virtue with knowledge, 6 and knowledge with
+^5^ For this very reason, make every effort to supplement your faith
+  with virtue, and virtue with knowledge, ^6^ and knowledge with
   self-control, and self-control with steadfastness, and steadfastness
-  with godliness, 7 and godliness with brotherly affection, and
+  with godliness, ^7^ and godliness with brotherly affection, and
   brotherly affection with love. (2 Peter 1:5-7)
   
 ## References
