@@ -1,6 +1,7 @@
 ---
 title: "Python Intro"
-output: html_notebook
+author: Nathan Malmberg
+output: html_document
 ---
 
 # Data Types, Variables and Functions
@@ -44,14 +45,16 @@ Python programs can be divided up by writing functions that are called by other 
 
 All four of the components of programming languages are illustrated in the program below. Look for the conditional statements, loops and functions, and see if you can figure out what the different parts of the program do.
 
-```{python, engine.path="python3.5"}
+```{python}
 # This program generates a rainbow using Turtle graphics. The rainbow
 # isn't a bow; it's more of a prismatic diagram of color.
 
 import turtle
+from time import sleep
 
 #Get turtle positioned to color
 turtle.home()
+sleep(10)
 turtle.colormode(255)
 turtle.penup()
 turtle.backward(300)
@@ -94,11 +97,11 @@ rampcolor(colors, 'r')
 
 A popular enhancement of structured programming is object-oriented programming, which collects related variables and functions together into an *object*. The variables and functions of an object, called *attributes* and *methods*, respectively, are defined as a *class*. Objects are then created as *instances* of the class. This often makes it conceptually easier to perform actions on collections of data.
 
-Object-oriented programming is deeply embedded in Python. Many of the main data types (such as strings, lists, and dictionaries) are objects in Python, and have their own associated methods. The standard library also defines several classes for different purposes, and users also have the option of defining their own classes.
+Object-oriented programming is deeply embedded in Python. Many of the main data types (such as strings, lists, and dictionaries) are objects in Python, and have their own associated methods. The standard library also defines several classes for different purposes, and users also have the option of defining their own classes. Attributes and methods in Python are accessed by following the name of the object with a period and the name of the attribute or method. 
 
 The code below defines a new class of Turtle, and instantiates that class with an object (called franklin). This particular class definition takes advantage of a concept called *inheritance*, which means that franklin can do everything a normal (computer) turtle can do, plus a new activity. Try running the program below, and then change the instructions to make franklin do different things, or even to create another turtle!
 
-```{python, engine.path="python3.5"}
+```{python}
 import turtle
 from time import sleep
 
@@ -117,7 +120,8 @@ class TurtleGon(turtle.Turtle):
         return
 
 franklin = TurtleGon()
-franklin.colorgon(["blue","red","green","green","orange"])
+sleep(5)
+franklin.colorgon(["blue","red","green","orange"], fillcolor="blue")
 sleep(5)
 ```
 
@@ -127,7 +131,7 @@ There have been a large number of modules for Python that have been created for 
 
 The program below searches for primer sequences in a file called sequence.gb, in GenBank format.
 
-```{python, engine.path="python3.5"}
+```{python}
 # This program reads in a sequence from a GenBank file and the sequences
 # of primers (in EMBOSS's primersearch format) used to amplify a region
 # of the DNA in the sequence file. The program outputs this sequence to
@@ -182,5 +186,28 @@ for fullsequence in SeqIO.parse('sequence.gb', 'genbank'):
 ```
 
 There are more examples of the use of Biopython on the website, and additional examples are being created.
+
+# Pandas
+
+While the standard Python libraries contain everything that would be required
+for performing data analysis, the process of analyzing large data sets would
+frequently be cumbersome and time-consuming, particularly since Python itself
+is not primarily optimized for speed. However, there have been several packages
+that have been developed for the purpose of data analysis. Different packages
+are frequently optimized for different aspects of the data analysis workflow.
+
+One of the more popular packages for data management and manipulation is called
+*pandas*. Pandas is designed as an extension of the *numpy* component of the scipy
+set of software for scientific data analysis. While numpy is designed to speed
+up calculations of large sets of numbers, pandas is designed to make management
+of large sets of numbers (and other collections of data) easier. The result is
+a set of commands that makes it relatively straightforward to manipulate large
+data sets in a consistent fashion.
+
+```{python}
+import pandas
+print(pandas.Series((3.1, 7.2, 12, -1.4)))
+```
+
 
 [^1]: Technically, it uses an iterator, which produces values one at a time until it reaches a stopping point. A list serves as an iterator by providing each item from the list until it runs out of items.
