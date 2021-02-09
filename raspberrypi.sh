@@ -20,7 +20,7 @@ sudo apt install emacs elpa-ess git magit
 cat <<'EOF' >> ~/.emacs
 (require 'package)
 (add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages"))
+             '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 EOF
 
