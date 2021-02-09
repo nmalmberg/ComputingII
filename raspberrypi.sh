@@ -11,7 +11,9 @@
 
 # Download R, Emacs and ESS from APT repositories.
 sudo apt update
-sudo apt install r-recommended r-cran-rsqlite
+sudo apt install r-recommended r-cran-ggplot2 r-cran-reticulate
+sudo apt install python3-pandas python3-seaborn python3-matplotlib
+sudo apt install python3-biopython
 sudo apt install emacs elpa-ess git magit
 
 # Add the MELPA repository to the Emacs package list
