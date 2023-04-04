@@ -197,7 +197,7 @@ that have been developed for the purpose of data analysis. Different packages
 are frequently optimized for different aspects of the data analysis workflow.
 
 One of the more popular packages for data management and manipulation is called
-*pandas*. Pandas is designed as an extension of the *numpy* component of the scipy
+*pandas*. Pandas is designed as an extension of the *numpy* component of the SciPy
 set of software for scientific data analysis. While numpy is designed to speed
 up calculations of large sets of numbers, pandas is designed to make management
 of large sets of numbers (and other collections of data) easier. The result is
@@ -206,7 +206,33 @@ data sets in a consistent fashion.
 
 ```{python}
 import pandas
-print(pandas.Series((3.1, 7.2, 12, -1.4)))
+numbers = pandas.Series((3.1, 7.2, 12, -1.4))
+print(numbers)
+print(numbers*numbers)
+print(numbers + 3)
+```
+
+One of the data collection objects defined by pandas is the Series, which is
+a set of numbers (or strings, but all of the same type), which can be used in
+calculations at the same time. The Series is also indexed, which means that
+the order of the elements of the Series don't need to be identical in operations
+involving two series, as long as they have the same values in the index.
+```{r}
+library(reticulate)
+```
+
+Multiple data series can be combined together into an object called a
+*DataFrame*. 
+
+```{python}
+import pandas
+import matplotlib.pyplot as plt
+gas = pandas.read_csv("gasoline.data", index_col=0, parse_dates=True,
+                      delim_whitespace=True)
+# print(gas)
+plt.figure()
+gas["ppg"][gas["fuel"]=="E10"].plot()
+plt.show()
 ```
 
 
